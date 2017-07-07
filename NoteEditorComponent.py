@@ -53,9 +53,13 @@ class NoteEditorComponent(ControlSurfaceComponent):
 		# quantization
 		self._quantization = 16
 
+		# Velocity color map.
+		self.velocity_map = [20, 50, 80, 105, 127]
+		self.velocity_color_map = [	"StepSequencer.NoteEditor.Velocity0", "StepSequencer.NoteEditor.Velocity1", "StepSequencer.NoteEditor.Velocity2", "StepSequencer.NoteEditor.Velocity3", "StepSequencer.NoteEditor.Velocity4"]
+
 		# velocity
 		self._velocity_index = 2
-		self._velocity = 100
+		self._velocity = self.velocity_map[self._velocity_index]
 		self._is_velocity_shifted = False
 		self._velocity_notes_pressed = 0
 		self._velocity_last_press = time.time()
@@ -269,10 +273,10 @@ class NoteEditorComponent(ControlSurfaceComponent):
 
 					if note_grid_x_position >= 0:
 						# compute colors
-						velocity_color = self.velocity_skin_name+str(0)
-						for index in range(self.velocities):
-							if note_velocity >= index*127/self.velocities:
-								velocity_color = self.velocity_skin_name+str(index)
+						velocity_color = self.velocity_color_map[0]
+						for index in range(len(self.velocity_map)):
+							if note_velocity >= self.velocity_map[index]:
+								velocity_color = self.velocity_color_map[index]
 						# highligh playing notes in red. even if they are from other pages.
 						if not note_muted and note_page == play_page and play_x_position == note_grid_x_position and (play_y_position == note_grid_y_position and not self.is_multinote or self.is_multinote and note_grid_y_offset == play_row) and self.song().is_playing and self._clip.is_playing:
 							self._grid_back_buffer[note_grid_x_position][note_grid_y_position] = self.playing_note_color
@@ -335,7 +339,7 @@ class NoteEditorComponent(ControlSurfaceComponent):
 				else:
 					time = self.quantization * (self._page * self.width * self.number_of_lines_per_note + y * self.width + x)
 					pitch = self._key_indexes[0]
-				velocity = value#self._velocity
+				velocity = self._velocity #setted by velocity button
 				duration = self.quantization
 
 				# TODO: use new better way for editing clip
@@ -350,10 +354,9 @@ class NoteEditorComponent(ControlSurfaceComponent):
 					if pitch == note[0] and time == note[1]:
 						if self._is_velocity_shifted:
 							# update velocity of the note
-							new_velocity= 0
-							for index in range(self.velocities):
-								if note[3] >= (index+1)*127/self.velocities:
-									new_velocity = (index+1)*127/self.velocities
+							for index in range(len(self.velocity_map)):
+								if note[3] >= self.velocity_map[index]:
+									new_velocity_index = (index + 1) % len(self.velocity_map)
 							note_cache.append([note[0], note[1], note[2], new_velocity, note[4]])
 						elif not self._is_mute_shifted:
 							note_cache.remove(note)
@@ -397,10 +400,10 @@ class NoteEditorComponent(ControlSurfaceComponent):
 		if self.is_enabled():
 			if ((value is 0) or (not sender.is_momentary())):
 				# button released
-				#if self._velocity_notes_pressed == 0 and time.time() - self._velocity_last_press < self.long_button_press:
+				if self._velocity_notes_pressed == 0 and time.time() - self._velocity_last_press < self.long_button_press:
 					# cycle thru velocities
-					#self._velocity_index = (len(self.velocity_map) + self._velocity_index + 1) % len(self.velocity_map)
-					#self._velocity = self.velocity_map[self._velocity_index]
+					self._velocity_index = (len(self.velocity_map) + self._velocity_index + 1) % len(self.velocity_map)
+					self._velocity = self.velocity_map[self._velocity_index]
 				self._is_velocity_shifted = False
 				self._stepsequencer._track_controller._implicit_arm = self._is_velocity_shifted
 				self._stepsequencer._track_controller._do_implicit_arm()
