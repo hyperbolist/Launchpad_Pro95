@@ -340,7 +340,7 @@ class NoteEditorComponent(ControlSurfaceComponent):
 					time = self.quantization * (self._page * self.width * self.number_of_lines_per_note + y * self.width + x)
 					pitch = self._key_indexes[0]
 				velocity = self._velocity #setted by velocity button
-				duration = self.quantization
+                                duration = self.quantization / 2
 
 				# TODO: use new better way for editing clip
 
