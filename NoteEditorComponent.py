@@ -54,11 +54,11 @@ class NoteEditorComponent(ControlSurfaceComponent):
 		self._quantization = 16
 
 		# Velocity color map.
-		self.velocity_map = [20, 50, 80, 105, 127]
-		self.velocity_color_map = [	"StepSequencer.NoteEditor.Velocity0", "StepSequencer.NoteEditor.Velocity1", "StepSequencer.NoteEditor.Velocity2", "StepSequencer.NoteEditor.Velocity3", "StepSequencer.NoteEditor.Velocity4"]
+		self.velocity_map = [39, 77, 127]
+		self.velocity_color_map = ["StepSequencer.NoteEditor.Velocity0", "StepSequencer.NoteEditor.Velocity1", "StepSequencer.NoteEditor.Velocity2"]
 
 		# velocity
-		self._velocity_index = 2
+		self._velocity_index = 1
 		self._velocity = self.velocity_map[self._velocity_index]
 		self._is_velocity_shifted = False
 		self._velocity_notes_pressed = 0
